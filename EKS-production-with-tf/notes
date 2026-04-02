@@ -1,0 +1,14 @@
+scoop install eksctl
+aws eks update-kubeconfig --region us-east-1 --name eks-cluster-terraform
+
+
+
+aws eks update-kubeconfig --region us-east-1 --name eks-cluster-terraform
+kubectl get nodes
+kubectl get pods -n kube-system
+
+
+
+ terraform import aws_eks_access_entry.tier_user "eks-cluster-terraform:arn:aws:iam::210190732631:user/3tier"            
+
+terraform import aws_eks_access_policy_association.tier_user_admin "eks-cluster-terraform#arn:aws:iam::210190732631:user/3tier#arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy#cluster"                     
