@@ -40,3 +40,4 @@ Thumbs.db
 
 # Kubernetes config (optional)
 kubeconfig
+terra-key-ec2
