@@ -15,7 +15,7 @@ variable "ec2_root_storage_type" {
 }
 
 variable "instance_type" {
-  default = "t3.micro"
+  default = "c7i-flex.large"
   type    = string
 }
 
