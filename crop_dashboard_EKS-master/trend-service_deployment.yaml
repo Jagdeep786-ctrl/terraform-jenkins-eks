@@ -59,6 +59,9 @@ spec:
 
 
 
+# kubectl create configmap mysql-initdb --from-file=init.sql=./db/init.sql -n stock
+
+
 # Invoke-RestMethod -Uri http://127.0.0.1:5001/predict -Method POST -ContentType "application/json" -Body '{"prices":[{"date":"2026-03-01","price":100},{"date":"2026-03-02","price":105}]}'
 
 # use these  command in apigateway service  inside the  -- /bin/sh 
