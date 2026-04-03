@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trend-service
+  namespace: stock
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: trend-service
+  template:
+    metadata:
+      labels:
+        app: trend-service
+    spec:
+      containers:
+      - name: trend-service
+        image: jagdeep144/trend-service:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
+        env:
+        - name: DB_HOST
+          value: "mysql.stock.svc.cluster.local"
+        - name: DB_PORT
+          value: "3306"
+        - name: DB_USER
+          value: "root"
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: MYSQL_ROOT_PASSWORD
+
+
+
+
+#Frontend → API Gateway → Go service → Trend service → API Gateway → Frontend
+
+#Go service fetches data from MySQL.
+
+#Then Go service sends the JSON to trend-service-python.
+
+#Trend service calculates predictions and responds.
+
+#So trend-service doesn’t need to know MySQL or the database; it only gets data from Go.
+
+#But usually, the Go service acts as the controller: it calls MySQL, then calls trend-service, then sends result back to API Gateway.
+
+#............................
+
+#Requests go like this:
+
+#Frontend → API Gateway → Go service
+
+#Go service → trend-service → Go service collects the response
+
+#Go service → API Gateway → Frontend
+
+
+
+# Invoke-RestMethod -Uri http://127.0.0.1:5001/predict -Method POST -ContentType "application/json" -Body '{"prices":[{"date":"2026-03-01","price":100},{"date":"2026-03-02","price":105}]}'
+
+# use these  command in apigateway service  inside the  -- /bin/sh 
+# wget -qO- --post-data='{"prices":[{"date":"2026-03-01","price":100},{"date":"2026-03-02","price":105}]}' \
+# --header="Content-Type: application/json" \
+# http://trend-service-python:5000/predict> >
+# {"trend":[{"date":"2026-03-02","price":105},{"date":"2026-03-07","price":130.0}]}
+# #         
+
+
+

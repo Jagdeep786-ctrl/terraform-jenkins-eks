@@ -1,0 +1,49 @@
+apiVersion: apps/v1     # go service connect with  my sql database
+kind: Deployment
+metadata:
+  name: data-service
+  namespace: stock
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: go-service
+  template:
+    metadata:
+      labels:
+        app: go-service
+    spec:
+      containers:
+      - name: go-service
+        image: jagdeep144/go-service:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8081
+
+        env:     #it needs to connectto my sql database
+        - name: DB_HOST
+          value: "mysql-db"
+        - name: DB_PORT
+          value: "3306"
+        - name: DB_USER
+          value: "root"
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: MYSQL_ROOT_PASSWORD
+        - name: DB_NAME
+          value: "cropdata"   
+      # - name: mysql-proxy-fixer
+      #   image: alpine/socat:latest 
+      #   command: ["sh", "-c"]
+      #   args:
+      #       # socat: Listen on port 3306 (which the Go app connects to) 
+      #       # this is used to  forward all traffic to the actual service name which is my myql-db and connect with port 3306(mysql-db:3306).
+      #     - "socat TCP-LISTEN:3306,fork TCP:mysql-db:3306"   
+      #   resources:
+      #     limits:
+      #       memory: "128Mi"
+      #       cpu: "500m" 
+
+# i understand that frontend(react) send req to api gateway then api gateway send to data-service-go here env helps to connect my go with my sql db and forward the request to sql db by using port 3306

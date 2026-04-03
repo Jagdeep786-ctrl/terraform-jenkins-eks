@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-db
+  namespace: stock
+spec:
+  selector:
+    app: mysql
+  ports:
+  - port: 3306
+    targetPort: 3306
+    protocol: TCP
+  type: ClusterIP
+
+
+  # kubectl exec -it mysql-deployment-58bdbc794b-rmd4k -n stock -- mysql -u root -p   
+  # then enter password: rootpassword
+  # copy from db init.sql  and paste invmysql terminal to create table and insert data
