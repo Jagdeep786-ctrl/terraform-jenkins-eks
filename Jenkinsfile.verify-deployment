@@ -1,0 +1,60 @@
+// apply 3rd
+
+pipeline {
+    agent any
+
+    environment {
+        AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+        AWS_DEFAULT_REGION    = 'us-east-1'
+
+        CLUSTER_NAME = 'eks-cluster-terraform'
+        ACCOUNT_ID   = '210190732631'
+        POLICY_NAME  = 'AWSLoadBalancerControllerIAMPolicy'
+    }
+
+    stages {
+
+
+        stage('Update kubeconfig') {
+            steps {
+                sh '''
+                    set -e
+                    aws eks update-kubeconfig \
+                      --region "$AWS_DEFAULT_REGION" \
+                      --name "$CLUSTER_NAME"
+                '''
+            }
+        }
+
+
+
+        stage('Deploy app manifests') {
+            steps {
+                sh '''
+                    set -e 
+                    kubectl apply -f namespace.yaml
+                    
+                    kubectl create configmap mysql-initdb \
+                       --from-file=init.sql=./db/init.sql \
+                       -n stock \
+                       --dry-run=client -o yaml | kubectl apply -f -
+
+                    kubectl apply -f . -n stock 
+                '''
+            }
+        }
+
+        stage('Verify resources') {
+            steps {
+                sh '''
+                    set -e
+                    kubectl get pods -n kube-system
+                    kubectl get pods -n stock
+                    kubectl get svc -n stock
+                    kubectl get ingress -n stock || true
+                '''
+            }
+        }
+    }
+}

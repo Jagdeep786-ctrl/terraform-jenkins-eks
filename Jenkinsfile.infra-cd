@@ -1,0 +1,95 @@
+
+// apply second
+
+pipeline {
+    agent any
+
+    environment {
+        AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+        AWS_DEFAULT_REGION    = 'us-east-1'
+
+     
+    }
+
+    stages {
+        stage('Checkout SCM') {
+            steps {
+                script{
+                    checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'git-cred', url: 'https://github.com/Jagdeep786-ctrl/terraform-jenkins-eks.git']])
+                }
+            }
+        }
+        
+        stage('initialise Terraform') {
+            steps {
+                script {
+                    dir('EKS-production-with-tf/infra_module') {
+                        sh 'terraform init'
+                    }
+                }
+            }
+        }
+        
+        stage('formatting Terraform') {
+            steps {
+                script {
+                    dir('EKS-production-with-tf/infra_module') {
+                        sh 'terraform fmt'
+                    }
+                }
+            }
+        }
+        
+        stage('validate Terraform') {
+            steps {
+                script {
+                    dir('EKS-production-with-tf/infra_module') {
+                        sh 'terraform validate'
+                    }
+                }
+            }
+        }
+        
+        
+        stage('Plan Terraform') {
+            steps {
+                script {
+                    dir('EKS-production-with-tf/infra_module') {
+                        sh 'terraform  plan'
+                    }
+                    input(message: "are you ready to plan", ok : "proceed")
+                }
+            }
+        } 
+        
+        stage('apply/destroy Eks Cluster') {
+            steps { 
+                script {
+                      dir('EKS-production-with-tf/infra_module'){
+                          sh 'terraform $action --auto-approve'
+                      }
+                      
+                }
+            }
+        }
+        
+        // another way to write actions(approve/destroy) it means in configure then in general then select parameterised, then add parameter then choice parameter , then name is action choices approve then enter destroy  save it
+        
+        //  stage('apply/destroy Eks Cluster') {
+        //     steps { 
+        //         script {
+        //               dir('EKS-production-with-tf/infra_module'){
+        //                   sh 'terraform ${params.action} --auto-approve'
+        //               }
+                      
+        //         }
+        //     }
+        // }
+        
+        
+        
+        
+        
+    }
+}    
