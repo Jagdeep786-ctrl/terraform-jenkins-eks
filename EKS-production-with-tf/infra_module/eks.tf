@@ -104,7 +104,7 @@ resource "aws_eks_access_policy_association" "tier_user_admin" {
 #kubectl get nodes
 
 # jet tu pella apply kita project fr tenu error milu ga  list-access-entry da  so apply this  , jo niche likha
-#terraform import "aws_eks_access_entry.tier_user" "eks-cluster-terraform:arn:aws:iam::210190732631:user/3tier"
+terraform import "aws_eks_access_entry.tier_user" "eks-cluster-terraform:arn:aws:iam::210190732631:user/3tier"
 
 
 
