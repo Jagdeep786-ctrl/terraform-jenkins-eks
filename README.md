@@ -19,6 +19,7 @@ This project demonstrates a complete end-to-end DevOps pipeline where infrastruc
 
 ---
 
+![Architecture Diagram](https://via.placeholder.com/1000x500.png?text=EKS+CI/CD+Architecture)
 ## 🏗️ Architecture Overview
 
 Developer → GitHub (SCM)
