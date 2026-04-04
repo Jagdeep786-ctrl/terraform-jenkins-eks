@@ -10,7 +10,7 @@ pipeline {
 
         CLUSTER_NAME = 'eks-cluster-terraform'
         ACCOUNT_ID   = '210190732631'
-        POLICY_NAME  = 'AWSLoadBalancerControllerIAMPolicy'
+     //  POLICY_NAME  = 'AWSLoadBalancerControllerIAMPolicy'
     }
 
     stages {
