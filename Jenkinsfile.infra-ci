@@ -25,6 +25,7 @@ pipeline {
                 script {
                     dir('EKS-production-with-tf/infra_module') {
                         sh 'terraform init'
+                        
                     }
                 }
             }
