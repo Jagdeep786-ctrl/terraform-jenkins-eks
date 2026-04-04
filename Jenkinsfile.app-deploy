@@ -113,6 +113,7 @@ pipeline {
                       --approve \
                       --region="$AWS_DEFAULT_REGION" \
                       --override-existing-serviceaccounts
+
                 '''
             }
         } 
@@ -133,7 +134,9 @@ pipeline {
                       --create-namespace \
                       --set clusterName="$CLUSTER_NAME" \
                       --set serviceAccount.create=false \
-                      --set serviceAccount.name=aws-load-balancer-controller
+                      --set serviceAccount.name=aws-load-balancer-controller \
+                       --set region="$AWS_DEFAULT_REGION" \
+                      --set vpcId="vpc-07bd89b3eba70bff2"
                 '''
             }
         }
