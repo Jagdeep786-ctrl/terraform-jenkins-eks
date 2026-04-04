@@ -11,6 +11,8 @@ pipeline {
         CLUSTER_NAME = 'eks-cluster-terraform'
         ACCOUNT_ID   = '210190732631'
         POLICY_NAME  = 'AWSLoadBalancerControllerIAMPolicy'
+         HELM_VERSION = 'v3.20.1'
+        PATH         = "${WORKSPACE}/.local/bin:${env.PATH}"
     }
 
     stages {
@@ -23,32 +25,43 @@ pipeline {
         }
 
 
-        stage('Install Helm if Missing') {
+        stage('Install Helm locally') {
             steps {
                 sh '''
                     set -e
-                    if ! command -v helm >/dev/null 2>&1; then
-                      curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+                    mkdir -p "$WORKSPACE/.local/bin"
+
+                    if [ ! -x "$WORKSPACE/.local/bin/helm" ]; then
+                      curl -fsSL -o /tmp/helm.tar.gz "https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz"
+                      rm -rf /tmp/linux-amd64
+                      tar -xzf /tmp/helm.tar.gz -C /tmp
+                      mv /tmp/linux-amd64/helm "$WORKSPACE/.local/bin/helm"
+                      chmod +x "$WORKSPACE/.local/bin/helm"
                     else
-                      echo "Helm already installed"
+                      echo "Helm already installed in workspace"
                     fi
+
+                    helm version
                 '''
             }
         }
+
 
         stage('Download IAM policy') {
             steps {
                 sh '''
                     set -e
-                    if ! command -v helm >/dev/null 2>&1; then
-                    curl -fsSL -o iam_policy.json \
-                      https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.14.1/docs/install/iam_policy.json
+                    if [ ! -f iam_policy.json ]; then
+                      curl -fsSL -o iam_policy.json \
+                        https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.14.1/docs/install/iam_policy.json
                     else
-                      echo "Policy already download"
+                      echo "IAM policy file already downloaded"
                     fi
                 '''
             }
         }
+
 
         stage('Create IAM policy if missing') {
             steps {
@@ -66,6 +79,10 @@ pipeline {
             }
         }
 
+
+
+
+
         stage('Associate OIDC provider') {
             steps {
                 sh '''
@@ -77,6 +94,11 @@ pipeline {
                 '''
             }
         }
+
+
+
+
+
 
         stage('Create/Update IAM service account') {
             steps {
@@ -95,6 +117,10 @@ pipeline {
             }
         } 
 
+
+ 
+
+
         stage('Install/Upgrade AWS Load Balancer Controller') {
             steps {
                 sh '''
@@ -111,6 +137,9 @@ pipeline {
                 '''
             }
         }
+
+
+
 
         stage('Verify controller') {
             steps {
@@ -139,3 +168,8 @@ pipeline {
 
     }
 }
+
+
+
+
+
