@@ -31,6 +31,7 @@ pipeline {
 
         stage('Deploy app manifests') {
             steps {
+             dir('crop_dashboard_EKS-master') {
                 sh '''
                     set -e 
                     kubectl apply -f namespace.yaml
@@ -42,6 +43,7 @@ pipeline {
 
                     kubectl apply -f . -n stock 
                 '''
+                }
             }
         }
 
