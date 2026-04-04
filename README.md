@@ -35,8 +35,6 @@ The system leverages:
 
 ## 🏗️ Architecture Overview
 
-![Architecture Diagram](https://via.placeholder.com/1000x500.png?text=EKS+CI/CD+Architecture)
-
 ```
 Developer → GitHub (SCM)
         ↓
