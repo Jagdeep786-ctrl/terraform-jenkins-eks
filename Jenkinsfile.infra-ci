@@ -24,8 +24,10 @@ pipeline {
             steps {
                 script {
                     dir('EKS-production-with-tf/infra_module') {
-                        sh 'terraform init'
-                        
+                        sh '''terraform init
+                            terraform import aws_eks_access_entry.tier_user "eks-cluster-terraform:arn:aws:iam::210190732631:user/3tier" || true
+                        '''
+
                     }
                 }
             }
